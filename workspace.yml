@@ -1,0 +1,5 @@
+# workspace.yml
+load_from:
+  - python_module:
+      module_name: dags.definitions
+      working_directory: .
