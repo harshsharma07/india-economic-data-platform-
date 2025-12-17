@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: rbi
+    config:
+      enabled: true
+    tables:
+      - name: issue_department_raw
+
+models:
+  - name: stg_rbi_issue_department
+    description: "Clean, typed RBI Issue Department data ingested via Dagster"
+    columns:
+      - name: period_date
+        tests:
+          - not_null
+          - unique
+
+      - name: total_liabilities
+        tests:
+          - not_null
+
+      - name: notes_in_circulation
+        tests:
+          - not_null
+
+      - name: notes_held_in_banking_dept
+        tests:
+          - not_null
+
+      - name: gold
+        tests:
+          - not_null
+
+      - name: foreign_securities
+        tests:
+          - not_null
+
+      - name: rupee_coin
+        tests:
+          - not_null
+
+      - name: goi_rupee_securities
+
