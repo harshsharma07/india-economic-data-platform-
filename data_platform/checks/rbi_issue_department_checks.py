@@ -1,5 +1,5 @@
 from dagster import AssetCheckResult, asset_check
-from dags.assets.rbi.issue_department import rbi_issue_department_raw
+from data_platform.assets.rbi.issue_department import rbi_issue_department_raw
 import snowflake.connector
 import os
 

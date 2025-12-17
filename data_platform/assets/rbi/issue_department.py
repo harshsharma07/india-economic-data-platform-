@@ -7,7 +7,7 @@ from snowflake.connector.errors import ProgrammingError
 from dagster_dbt import dbt_assets, DbtCliResource
 from src.rbi.excel_reader import read_issue_department_excel
 
-DBT_PROJECT_DIR = Path("dbt_rbi")
+DBT_PROJECT_DIR = Path("dbt")
 
 def get_max_period_date(conn, table_name: str):
     cursor = conn.cursor()
