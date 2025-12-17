@@ -1,4 +1,5 @@
-from dagster import asset_check, AssetCheckResult
+from dagster import AssetCheckResult, asset_check
+from dags.assets.rbi.issue_department import rbi_issue_department_raw
 import snowflake.connector
 import os
 
@@ -15,7 +16,7 @@ def get_snowflake_connection():
     )
 
 
-@asset_check(asset="rbi_issue_department_raw", name="period_date_not_null")
+@asset_check(asset=rbi_issue_department_raw, name="period_date_not_null")
 def period_date_not_null_check(context) -> AssetCheckResult:
     conn = get_snowflake_connection()
     cursor = conn.cursor()
@@ -36,7 +37,7 @@ def period_date_not_null_check(context) -> AssetCheckResult:
         cursor.close()
         conn.close()
 
-@asset_check(asset="rbi_issue_department_raw", name="no_duplicate_periods")
+@asset_check(asset=rbi_issue_department_raw, name="no_duplicate_periods")
 def no_duplicate_periods_check(context) -> AssetCheckResult:
     conn = get_snowflake_connection()
     cursor = conn.cursor()
@@ -61,7 +62,7 @@ def no_duplicate_periods_check(context) -> AssetCheckResult:
         cursor.close()
         conn.close()
 
-@asset_check(asset="rbi_issue_department_raw", name="balance_sheet_balances")
+@asset_check(asset=rbi_issue_department_raw, name="balance_sheet_balances")
 def balance_sheet_balances_check(context) -> AssetCheckResult:
     conn = get_snowflake_connection()
     cursor = conn.cursor()
@@ -86,7 +87,7 @@ def balance_sheet_balances_check(context) -> AssetCheckResult:
         conn.close()
 
 
-@asset_check(asset="rbi_issue_department_raw", name="negative_value")
+@asset_check(asset=rbi_issue_department_raw, name="negative_value")
 def negative_value_check(context) -> AssetCheckResult:
     conn = get_snowflake_connection()
     cursor = conn.cursor()

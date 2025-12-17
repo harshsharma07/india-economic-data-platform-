@@ -4,8 +4,10 @@ from pathlib import Path
 from snowflake.connector.pandas_tools import write_pandas
 from snowflake.connector import connect
 from snowflake.connector.errors import ProgrammingError
-
+from dagster_dbt import dbt_assets, DbtCliResource
 from src.rbi.excel_reader import read_issue_department_excel
+
+DBT_PROJECT_DIR = Path("dbt_rbi")
 
 def get_max_period_date(conn, table_name: str):
     cursor = conn.cursor()
@@ -23,9 +25,9 @@ def get_max_period_date(conn, table_name: str):
         cursor.close()
 
 @asset(
-    name="rbi_issue_department_raw",
-    group_name="rbi",
-    description="RBI Issue Department liabilities & assets (weekly/monthly) from Excel source"
+    name="issue_department_raw",
+    description="RBI Issue Department liabilities & assets (monthly) from Excel source",
+    key_prefix=["rbi"], # Given this prefix to adjust with dbt source name for the proper lineage.
 )
 def rbi_issue_department_raw(context) -> Output:
     file_path = Path("source/RBI - Liabilities & Assets.xlsx")
@@ -57,16 +59,16 @@ def rbi_issue_department_raw(context) -> Output:
         # Incremental filter
         if max_loaded_period:
 
-            df_new = df[df["PERIOD_DATE"] > max_loaded_period]
+            result_df = df[df["PERIOD_DATE"] > max_loaded_period]
         else:
-            df_new = df  # first run
+            result_df = df  # first run
 
         # Write only if new data exists
         rows_inserted = 0
-        if not df_new.empty:
+        if not result_df.empty:
             success, nchunks, nrows, _ = write_pandas(
                 conn=conn,
-                df=df_new,
+                df=result_df,
                 table_name=table_name,
                 auto_create_table=True,
             )
@@ -92,3 +94,9 @@ def rbi_issue_department_raw(context) -> Output:
             "load_type": "incremental"
         }
     )
+
+
+@dbt_assets(manifest=DBT_PROJECT_DIR / "target" / "manifest.json",
+    )
+def rbi_dbt_assets(context, dbt: DbtCliResource):
+    yield from dbt.cli(["build"], context=context).stream()

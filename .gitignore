@@ -1,2 +1,8 @@
 .tmp*
-*pycache*
+.env
+.venv
+__pycache__/
+.dbt/
+target/
+logs/
+*.pyc
